@@ -1,16 +1,27 @@
 "use client";
 
-import { useAuthors } from "@/lib/hooks/use-authors";
+import { CmsDeleteButton } from "@/components/admin/cms-delete-button";
+import { CmsTableSkeleton } from "@/components/admin/cms-table-skeleton";
+import { useAuthors, useDeleteAuthor } from "@/lib/hooks/use-authors";
 
 export function AuthorsTable() {
   const { data: authors = [], isLoading, error } = useAuthors();
+  const deleteAuthor = useDeleteAuthor();
+
+  async function handleDelete(slug: string) {
+    try {
+      await deleteAuthor.mutateAsync(slug);
+      return { ok: true as const };
+    } catch (err) {
+      return {
+        ok: false as const,
+        error: err instanceof Error ? err.message : "Failed to delete.",
+      };
+    }
+  }
 
   if (isLoading) {
-    return (
-      <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-        Loading authors...
-      </p>
-    );
+    return <CmsTableSkeleton label="Loading authors..." columns={4} />;
   }
 
   if (error) {
@@ -40,6 +51,7 @@ export function AuthorsTable() {
             <th className="px-4 py-3 font-medium">Name</th>
             <th className="px-4 py-3 font-medium">Slug</th>
             <th className="px-4 py-3 font-medium">Posts</th>
+            <th className="px-4 py-3 font-medium text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -53,6 +65,15 @@ export function AuthorsTable() {
               </td>
               <td className="px-4 py-3 text-muted-foreground">{author.slug}</td>
               <td className="px-4 py-3 text-muted-foreground">—</td>
+              <td className="px-4 py-3">
+                <div className="flex justify-end">
+                  <CmsDeleteButton
+                    itemLabel={author.name}
+                    disabled={deleteAuthor.isPending}
+                    onDelete={() => handleDelete(author.slug)}
+                  />
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

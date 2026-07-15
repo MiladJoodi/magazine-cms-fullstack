@@ -1,8 +1,12 @@
-"use client"
+"use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createAuthor, getAuthors } from "../services/authors.service";
-import { createAuthorInput } from "../types/author";
+import {
+  createAuthor,
+  deleteAuthor,
+  getAuthors,
+} from "@/lib/services/authors.service";
+import type { createAuthorInput } from "@/lib/types/author";
 
 export function useAuthors() {
   return useQuery({
@@ -19,6 +23,16 @@ export function useCreateAuthor() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["authors"] });
     },
-  })
+  });
+}
 
+export function useDeleteAuthor() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (slug: string) => deleteAuthor(slug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["authors"] });
+    },
+  });
 }

@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 
 import { CategoryEditForm } from "@/components/admin/category-edit-form";
 import { CmsDeleteButton } from "@/components/admin/cms-delete-button";
+import { CmsTableSkeleton } from "@/components/admin/cms-table-skeleton";
 import { Button } from "@/components/ui/button";
 import { useCategories, useDeleteCategory } from "@/lib/hooks/use-categories";
 
@@ -27,11 +28,7 @@ export function CategoriesTable() {
   }
 
   if (isLoading) {
-    return (
-      <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-        Loading categories...
-      </p>
-    );
+    return <CmsTableSkeleton label="Loading categories..." columns={4} />;
   }
 
   if (error) {

@@ -23,3 +23,12 @@ export async function createAuthor(input: createAuthorInput): Promise<Author> {
 
     return data as Author;
 }
+
+export async function deleteAuthor(slug: string): Promise<void> {
+  const res = await fetch(`${BASE}/${slug}`, { method: "DELETE" });
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to delete author");
+  }
+}
