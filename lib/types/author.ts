@@ -10,4 +10,9 @@ export type Author = {
 export type createAuthorInput = {
   name: string;
   bio?: string | null;
-}
+};
+
+export type UpdateAuthorInput = {
+  name: string;
+  bio?: string | null;
+};

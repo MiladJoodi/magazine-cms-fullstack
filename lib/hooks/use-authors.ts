@@ -5,8 +5,12 @@ import {
   createAuthor,
   deleteAuthor,
   getAuthors,
+  updateAuthor,
 } from "@/lib/services/authors.service";
-import type { createAuthorInput } from "@/lib/types/author";
+import type {
+  createAuthorInput,
+  UpdateAuthorInput,
+} from "@/lib/types/author";
 
 export function useAuthors() {
   return useQuery({
@@ -31,6 +35,23 @@ export function useDeleteAuthor() {
 
   return useMutation({
     mutationFn: (slug: string) => deleteAuthor(slug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["authors"] });
+    },
+  });
+}
+
+export function useUpdateAuthor() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      slug,
+      input,
+    }: {
+      slug: string;
+      input: UpdateAuthorInput;
+    }) => updateAuthor(slug, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["authors"] });
     },

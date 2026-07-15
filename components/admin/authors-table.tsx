@@ -1,10 +1,17 @@
 "use client";
 
+import { Fragment, useState } from "react";
+import { Pencil } from "lucide-react";
+
+import { AuthorEditForm } from "@/components/admin/author-edit-form";
 import { CmsDeleteButton } from "@/components/admin/cms-delete-button";
 import { CmsTableSkeleton } from "@/components/admin/cms-table-skeleton";
+import { Button } from "@/components/ui/button";
 import { useAuthors, useDeleteAuthor } from "@/lib/hooks/use-authors";
 
 export function AuthorsTable() {
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
+
   const { data: authors = [], isLoading, error } = useAuthors();
   const deleteAuthor = useDeleteAuthor();
 
@@ -56,25 +63,53 @@ export function AuthorsTable() {
         </thead>
         <tbody>
           {authors.map((author) => (
-            <tr key={author.slug} className="border-b last:border-0">
-              <td className="px-4 py-3">
-                <p className="font-medium">{author.name}</p>
-                {author.bio ? (
-                  <p className="text-xs text-muted-foreground">{author.bio}</p>
-                ) : null}
-              </td>
-              <td className="px-4 py-3 text-muted-foreground">{author.slug}</td>
-              <td className="px-4 py-3 text-muted-foreground">—</td>
-              <td className="px-4 py-3">
-                <div className="flex justify-end">
-                  <CmsDeleteButton
-                    itemLabel={author.name}
-                    disabled={deleteAuthor.isPending}
-                    onDelete={() => handleDelete(author.slug)}
-                  />
-                </div>
-              </td>
-            </tr>
+            <Fragment key={author.slug}>
+              <tr className="border-b">
+                <td className="px-4 py-3">
+                  <p className="font-medium">{author.name}</p>
+                  {author.bio ? (
+                    <p className="text-xs text-muted-foreground">{author.bio}</p>
+                  ) : null}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {author.slug}
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">—</td>
+                <td className="px-4 py-3">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setEditingSlug((current) =>
+                          current === author.slug ? null : author.slug
+                        )
+                      }
+                    >
+                      <Pencil className="size-3.5" aria-hidden />
+                      {editingSlug === author.slug ? "Close" : "Edit"}
+                    </Button>
+                    <CmsDeleteButton
+                      itemLabel={author.name}
+                      disabled={deleteAuthor.isPending}
+                      onDelete={() => handleDelete(author.slug)}
+                    />
+                  </div>
+                </td>
+              </tr>
+              {editingSlug === author.slug ? (
+                <tr className="border-b last:border-0">
+                  <td colSpan={4} className="px-4 py-3">
+                    <AuthorEditForm
+                      author={author}
+                      onCancel={() => setEditingSlug(null)}
+                      onSaved={() => setEditingSlug(null)}
+                    />
+                  </td>
+                </tr>
+              ) : null}
+            </Fragment>
           ))}
         </tbody>
       </table>

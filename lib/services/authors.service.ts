@@ -1,4 +1,8 @@
-import { Author, createAuthorInput } from "../types/author";
+import type {
+  Author,
+  createAuthorInput,
+  UpdateAuthorInput,
+} from "@/lib/types/author";
 
 const BASE = "/api/authors";
 
@@ -31,4 +35,20 @@ export async function deleteAuthor(slug: string): Promise<void> {
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to delete author");
   }
+}
+
+export async function updateAuthor(
+  slug: string,
+  input: UpdateAuthorInput
+): Promise<Author> {
+  const res = await fetch(`${BASE}/${slug}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to update author");
+  }
+  return data as Author;
 }
